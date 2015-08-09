@@ -38,7 +38,7 @@
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 	      <ul class="nav navbar-nav">
 	        <li><a href="<?=$url?>inicio/negociosCercanos">Ver negocios cercanos</a></li>
-	        <li><a href="<?=$url?>inicio/nuevo">mapa</a></li>
+	        <li><a href="<?=$url?>nuevo">Nuevo</a></li>
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Busqueda Personalizada <span class="caret"></span></a>
 	          <ul class="dropdown-menu">
@@ -70,7 +70,7 @@
 			echo isset($contenido)? $contenido : '';
 			?>
 
-			<div id="ocupado" class="col-md-10 col-md-offset-1 well well-sm">
+			<div id="ocupado" class="col-md-10 col-md-offset-1 well well-sm" style="display:none">
 				<h1 class="fadeIn animated" id="resultadoOcupado"></h1>
 				<a type="button" href="" class=" btn btn-success">siguiente</a> 			
 			</div>	
@@ -175,7 +175,7 @@
     	});
 
     	$("#comprobarNombre").on("keypress",function(event) {
-    		$("#resultados").html(" ");
+    		$("#ocupado").css("display","block");
 			if ( event.which == 13 ) {
 		    	event.preventDefault();
 				var value = $(this).val();
@@ -194,6 +194,21 @@
 	$("#localizacion").click(function(){
 		$("#mapacercanos").css("display","block");
 		initialize();
+	});
+
+	$("#todo").click(function(){
+		$.ajax({
+			url : base_url+"gerardo/pruebados",
+			type: "GET"
+		}).done(function(data){
+			$.each(data, function(index, val) {
+			 	var geocoder = new google.maps.Geocoder();
+			    // Hacemos la petición indicando la dirección e invocamos la función
+			    // geocodeResult enviando todo el resultado obtenido
+			    geocoder.geocode({ 'address': "San Luis Potosi "+val["Domicilio"]}, geocodeResult);
+			    console.log(index);
+			});
+		});
 	});
 	var map;
 
@@ -242,11 +257,61 @@
 	  var infowindow = new google.maps.InfoWindow(options);
 	  map.setCenter(options.position);
 	}
-    $(document).ready(function() {
-    //load_map();
+    
+	function geocodeResult(results, status) {
+	    // Verificamos el estatus
+	    if (status == 'OK') {
+	        // Si hay resultados encontrados, centramos y repintamos el mapa
+	        // esto para eliminar cualquier pin antes puesto
+	        var mapOptions = {
+	            center: results[0].geometry.location,
+	            mapTypeId: google.maps.MapTypeId.ROADMAP
+	        };
+	        map = new google.maps.Map($("#map_canvas").get(0), mapOptions);
+	        // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
+	        map.fitBounds(results[0].geometry.viewport);
+	        // Dibujamos un marcador con la ubicación del primer resultado obtenido
+	        var markerOptions = { position: results[0].geometry.location }
+	        var marker = new google.maps.Marker(markerOptions);
+	        marker.setMap(map);
+
+	        $.ajax({
+		    	url : base_url+"gerardo/guardarDatos",
+		    	data: {latitude:position.coords.latitude,longuitud:position.coords.longitude}
+		    });
+	    } else {
+	        // En caso de no haber resultados o que haya ocurrido un error
+	        // lanzamos un mensaje con el error
+	        alert("Geocoding no tuvo éxito debido a: " + status);
+	    }
+	}
+
+	function getLocation() {
+	    if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(showPosition);
+	    } else {
+	        x.innerHTML = "Geolocation is not supported by this browser.";
+	    }
+	}
+	function showPosition(position) {
+		console.log("holla");
+	    x.innerHTML = "Latitude: " + position.coords.latitude + 
+	    "<br>Longitude: " + position.coords.longitude;
+	}
+	$(document).on(function(){
+		load_map();
+		
 	});
+	function load_map() {
+		    var myLatlng = new google.maps.LatLng(20.68009, -101.35403);
+		    var myOptions = {
+		        zoom: 4,
+		        center: myLatlng,
+		        mapTypeId: google.maps.MapTypeId.ROADMAP
+		    };
+		    map = new google.maps.Map($("#map_canvas").get(0), myOptions);
+		}
 /* 
-var map;
  
 function load_map() {
     var myLatlng = new google.maps.LatLng(20.68009, -101.35403);
