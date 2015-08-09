@@ -14,9 +14,9 @@ class Inicio extends CI_Controller {
 
 		$this->load->view('html', "", FALSE);
 	}
-	public function cercanos()
+	public function negociosCercanos()
 	{
-		# code...
+		$this->load->view('html', "", FALSE);
 	}
 	public function buscar()
 	{
