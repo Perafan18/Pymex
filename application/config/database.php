@@ -68,6 +68,13 @@ $db['default'] = array(
 	'username' => 'root',
 	'password' => '',
 	'database' => 'pymex',
+	/*
+	'hostname' => 'mysql.nixiweb.com',
+	'username' => 'u159367300_pimex',
+	'password' => 'tujefaentanga123#',
+	'database' => 'u159367300_pimex',
+	*/
+	
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

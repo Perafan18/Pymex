@@ -22,7 +22,7 @@ class Minicio extends CI_Model {
 	{
 		$this->db->select('ID,RazonSocial as Nombre,Giro,Domicilio,Colonia');
 		$this->db->like("RazonSocial",$nombre);
-		$query = $this->db->get('licencias');
+		$query = $this->db->get('licencias',100,0);
 		if($query->num_rows()>0){
 			return $query->result_array();
 		}else{
@@ -45,7 +45,7 @@ class Minicio extends CI_Model {
 	{
 		$this->db->select('ID,RazonSocial as Nombre,Giro,Domicilio,Colonia');
 		$this->db->where("Colonia",$colonia);
-		$query = $this->db->get('licencias');
+		$query = $this->db->get('licencias',100,0);
 		if($query->num_rows()>0){
 			return $query->result_array();
 		}else{
@@ -68,7 +68,7 @@ class Minicio extends CI_Model {
 	{
 		$this->db->select('ID,RazonSocial as Nombre,Giro,Domicilio,Colonia');
 		$this->db->where("Giro",$giro);
-		$query = $this->db->get('licencias');
+		$query = $this->db->get('licencias',100,0);
 		if($query->num_rows()>0){
 			return $query->result_array();
 		}else{
