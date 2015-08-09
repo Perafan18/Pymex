@@ -33,8 +33,10 @@ class Inicio extends CI_Controller {
 	{
 		$nombre = $this->input->get_post('nombre', TRUE);
 		$resultados = $this->minicio->getDatos_byNombre($nombre);
+		$this->minicio->registroBusqueda($nombre,'nombre');
 		//$resultados = '{"registros":'.json_encode($resultados).'}';
 		$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
+		
 	}
 	public function buscarColonia()
 	{
@@ -46,6 +48,7 @@ class Inicio extends CI_Controller {
 	{
 		$colonia = $this->input->post('colonia', TRUE);
 		$resultados = $this->minicio->getDatos_byColonia($colonia);
+		$this->minicio->registroBusqueda($colonia,'colonia');
 		$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
 	}
 	public function buscarGiro()
@@ -57,6 +60,7 @@ class Inicio extends CI_Controller {
 	public function busquedaGiro()
 	{
 		$giro = $this->input->post('giro', TRUE);
+		$this->minicio->registroBusqueda($giro,'giro');
 		$resultados = $this->minicio->getDatos_byGiro($giro);
 		$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
 	}
@@ -64,6 +68,20 @@ class Inicio extends CI_Controller {
 	public function verNegocio()
 	{
 
+	}
+
+	public function busquedaRegistro()
+	{
+		//$registro = $this->input->post('registro',TRUE);
+
+	} 
+
+	public function analisisdatos()
+	{
+		$this->load->view('analisis/header', $data, FALSE);
+		$this->load->minicio->algoBusqueda();
+		$this->load->view('analisis/analisis', $data, FALSE);
+		$this->load->view('analisis/footer', $data, FALSE);
 	}
 }
 

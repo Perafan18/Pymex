@@ -126,4 +126,4 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <div id="map-canvas"></div>
   </body>
 </html>
->>>>>>> origin/master
+
