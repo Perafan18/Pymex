@@ -11,7 +11,8 @@ class Inicio extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->view('html', "", FALSE);
+		$data["contenido"] = $this->load->view('inicio',"",TRUE);
+		$this->load->view('html', $data, FALSE);
 	}
 	public function negociosCercanos()
 	{
@@ -66,7 +67,7 @@ class Inicio extends CI_Controller {
 	}
 	public function busquedaGiro()
 	{
-		$giro = $this->input->post('giro', TRUE);
+		$giro = $this->input->get_post('giro', TRUE);
 		$this->minicio->registroBusqueda($giro,'giro');
 		$resultados = $this->minicio->getDatos_byGiro($giro);
 		$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
@@ -76,7 +77,15 @@ class Inicio extends CI_Controller {
 	{
 
 	}
-
+	public function verMapa()
+	{
+		$id = $this->input->get("id", TRUE);
+		$data_mapa["coordenadas"] = $this->minicio->verCoordenadas($id);
+		$data_mapa["datos"] = $this->minicio->getDatos_byID($id);
+		$data["contenido"] = $this->load->view('mapa',$data_mapa, TRUE);
+		$this->load->view('html',$data, FALSE);	
+		
+	}
 	public function busquedaRegistro()
 	{
 		//$registro = $this->input->post('registro',TRUE);
@@ -89,6 +98,19 @@ class Inicio extends CI_Controller {
 		$this->load->minicio->algoBusqueda();
 		$this->load->view('analisis/analisis', $data, FALSE);
 		$this->load->view('analisis/footer', $data, FALSE);
+	}
+	public function buscarGiros()
+	{
+		$data_buscador["opciones"] = $this->minicio->getGiros();
+		$data["contenido"] = $this->load->view('nuevo/nuevoGiro',$data_buscador , TRUE);
+		$this->load->view('html',$data, FALSE);	
+	}
+	public function nuevoGiro()
+	{
+		$giro = $this->input->get_post('giro', TRUE);
+		$this->minicio->registroBusqueda($giro,'giro');
+		$resultados = $this->minicio->getDatos_byGiro($giro);
+		$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
 	}
 }
 

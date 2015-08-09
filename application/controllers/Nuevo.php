@@ -43,6 +43,14 @@
 			$this->output->set_content_type('application/json')->set_output(json_encode($resultados));	
 
 		}
+		public function nuevoGiro()
+		{
+			$giro = $this->input->get_post('giro', TRUE);
+			$lat = $this->input->get_post('lat', TRUE);
+			$lon = $this->input->get_post('lon', TRUE);
+			$datos = $this->minicio->giroCercan($lat,$lon,$giro);
+			$this->output->set_content_type('application/json')->set_output(json_encode($datos));
+		}
 
 	}
 

@@ -5,14 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Nombre</title>
+    <title>Pimex</title>
 
     <!-- Bootstrap -->
     <?php
     $url = base_url();
     ?>
-	<link href="css/animate.css" rel="stylesheet">
     <link href="<?=$url?>css/bootstrap.min.css" rel="stylesheet">
+	<link href="<?=$url?>css/material.min.css" rel="stylesheet">
+    <link href="<?=$url?>css/material-fullpalette.min.css" rel="stylesheet">
+    <link href="<?=$url?>css/ripples.min.css" rel="stylesheet">
+    <link href="<?=$url?>css/roboto.min.css" rel="stylesheet">
 	<script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7170VuMY8-WHDKzMImO-9Lv2LpFH7xwQ"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -23,7 +26,7 @@
     <![endif]-->
 </head>
   <body>
-  	<nav class="navbar navbar-inverse navbar-static-top">
+  	<nav class="navbar navbar-static-top navbar-material-blue-grey-900">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
 	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -32,7 +35,7 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <a class="navbar-brand" href="#">Nombre</a>
+	      <a class="navbar-brand" href="<?=$url;?>"><img src="<?=base_url();?>img/logo.png"  style="height:35px;" alt=""></a>
 	    </div>
 
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -74,7 +77,7 @@
 
 			<div id="ocupado" class="col-md-10 col-md-offset-1 well well-sm" style="display:none">
 				<h1 class="fadeIn animated" id="resultadoOcupado"></h1>
-				<a type="button" href="" class=" btn btn-success" style="display:none">Siguiente</a> 			
+				<a type="button" id="nuevoGiro" href="<?=$url?>inicio/buscarGiros" class=" btn btn-success" style="display:none">Siguiente</a> 			
 			</div>	
 			
 
@@ -105,14 +108,14 @@
 
     $(document).on("ready",function(){
     	
-    	function plantilla(nombre,tipo,direccion){
+    	function plantilla(nombre,tipo,direccion,id){
     		var html;
 	        html+='  <tr>';
 	        html+='    <td>'+nombre+'</td>';
 	        html+='    <td>'+tipo+'</td>';
 	        html+='    <td>'+direccion+'</td>';
 	        html+='    <td>     ';                  
-	        html+='      <a class="btn btn-default" href=" " role="button">Link</a>';
+	        html+='      <a class="btn btn-default" href="'+base_url+'inicio/verMapa?id='+id+'" role="button">ver Mapa</a>';
 	        html+='    </td> ';        
 	        html+='  </tr>';
 	        return html;
@@ -133,7 +136,7 @@
 		  			console.log(data);
 		  			if(data!=false){
 		  				$.each(data, function(index, val) {
-		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"],val["ID"]));
 		  				});
 		  			}
 		  		});	
@@ -151,10 +154,69 @@
 		  			console.log(data);
 		  			if(data!=false){
 		  				$.each(data, function(index, val) {
-		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"],val["ID"]));
 		  				});
 		  			}
 		  		});
+    	});
+
+		$("#SelectGiro").change(function(event) {
+			 if(navigator.geolocation) {
+			 	var mapOptions = {
+			    zoom: 12
+			  };
+	  			map = new google.maps.Map(document.getElementById('canvasGiro'),mapOptions);
+   				 navigator.geolocation.getCurrentPosition(function(position) {
+
+   				 	var pos = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				    console.log(pos);
+				    
+				    var infowindow = new google.maps.InfoWindow({
+				        map: map,
+				        position: pos,
+				        content: 'Tu posición'
+			 	     });
+					
+				    
+				    var array = [];
+				    var arraydos = [];
+				     
+				    map.setCenter(pos);
+
+   				 	var lat = position.coords.latitude;
+   				 	var lon = position.coords.longitude;
+					var giro = $("#SelectGiro").val();
+					console.log(lat);
+					console.log(lon);
+					console.log(giro);
+					$.ajax({
+			  			url : base_url+"nuevo/nuevoGiro",
+			  			type : "POST",
+			  			data : { giro: giro,lat:lat,lon:lon},
+			  		}).done(function(data){
+			  			console.log("data:"+data);
+			  			if(data!=false){
+			  				$.each(data, function(index, val) {
+			  					var nuevo = Number(val["Latitud"])/1.0;
+				    			var dos = Number(val["Longuitud"])/1.0;
+				    			nuevo = parseFloat(nuevo).toFixed(6);
+				    			dos = parseFloat(dos).toFixed(6);
+				    			var myLatlng = new google.maps.LatLng(dos,nuevo);
+				    			var marker = new google.maps.Marker({
+						      		position: myLatlng,
+								    map: map,
+								    title: val["Nombre"]
+								});
+			  				});
+			  				
+			  			}
+			  		}).fail(function(data){
+			  			alert("algo se cago");
+			  		});
+		  		});
+		  	}else{
+		  		alert("No es compatible este navegador");
+		  	}
     	});
 
 		$("#SelectGiros").change(function(event) {
@@ -169,12 +231,13 @@
 		  			if(data!=false){
 		  				
 		  				$.each(data, function(index, val) {
-		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"],val["ID"]));
 		  				});
 		  				
 		  			}
 		  		});
     	});
+
 
     	$("#comprobarNombre").on("keypress",function(event) {
     		if ( event.which == 13 ) {
@@ -269,6 +332,7 @@
 	    			});
 	    		}
 	    	});
+	    	
 	    	/*
 	    	setTimeout(function(){
 	    		for(var i=0;i<array.length;i++){
