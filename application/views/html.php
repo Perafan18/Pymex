@@ -21,7 +21,7 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+</head>
   <body>
   	<nav class="navbar navbar-inverse navbar-static-top">
 	  <div class="container-fluid">
@@ -38,6 +38,7 @@
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 	      <ul class="nav navbar-nav">
 	        <li><a href="<?=$url?>inicio/negociosCercanos">Ver negocios cercanos</a></li>
+	        <li><a href="<?=$url?>inicio/nuevo">mapa</a></li>
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Busqueda Personalizada <span class="caret"></span></a>
 	          <ul class="dropdown-menu">
@@ -59,8 +60,11 @@
 	<div class="container">
 		<div class="row-fluid">
 			<!--
-			<div><input type="text" maxlength="100" id="address" placeholder="Dirección" /> <input type="button" id="search" value="Buscar" /></div><br/>
-<div id='map_canvas' style="width:600px; height:400px;"></div>
+			<div>
+			<input type="text" maxlength="100" id="address" placeholder="Dirección" /> 
+			<input type="button" id="search" value="Buscar" /></div><br/>
+			<div id='map_canvas' style="width:600px; height:400px;">
+			</div>
 			-->
 			<?php
 			echo isset($contenido)? $contenido : '';
@@ -187,10 +191,61 @@
     	});
 
     });
+	$("#localizacion").click(function(){
+		$("#mapacercanos").css("display","block");
+		initialize();
+	});
+	var map;
+
+	function initialize() {
+	  var mapOptions = {
+	    zoom: 15
+	  };
+	  map = new google.maps.Map(document.getElementById('map-canvas'),
+	      mapOptions);
+
+	  // Try HTML5 geolocation
+	  if(navigator.geolocation) {
+	    navigator.geolocation.getCurrentPosition(function(position) {
+	      var pos = new google.maps.LatLng(position.coords.latitude,
+	                                       position.coords.longitude);
+
+	      var infowindow = new google.maps.InfoWindow({
+	        map: map,
+	        position: pos,
+	        content: 'Tu posición'
+	      });
+
+	      map.setCenter(pos);
+	    }, function() {
+	      handleNoGeolocation(true);
+	    });
+	  } else {
+	    // Browser doesn't support Geolocation
+	    handleNoGeolocation(false);
+	  }
+	}
+
+	function handleNoGeolocation(errorFlag) {
+	  if (errorFlag) {
+	    var content = 'Error: The Geolocation service failed.';
+	  } else {
+	    var content = 'Error: Your browser doesn\'t support geolocation.';
+	  }
+
+	  var options = {
+	    map: map,
+	    position: new google.maps.LatLng(60, 105),
+	    content: content
+	  };
+
+	  var infowindow = new google.maps.InfoWindow(options);
+	  map.setCenter(options.position);
+	}
     $(document).ready(function() {
     //load_map();
-});
- 
+	});
+/* 
 var map;
  
 function load_map() {
@@ -235,6 +290,19 @@ function geocodeResult(results, status) {
         alert("Geocoding no tuvo éxito debido a: " + status);
     }
 }
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+function showPosition(position) {
+    x.innerHTML = "Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude; 
+}
+*/
     </script>
   </body>
 </html>

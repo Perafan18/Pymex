@@ -11,12 +11,13 @@ class Inicio extends CI_Controller {
 
 	public function index()
 	{
-
 		$this->load->view('html', "", FALSE);
 	}
 	public function negociosCercanos()
 	{
-		$this->load->view('html', "", FALSE);
+		$data["contenido"] = $this->load->view('negociosCercanos',"", TRUE);
+		$this->load->view('html', $data, FALSE);
+
 	}
 	public function buscar()
 	{
