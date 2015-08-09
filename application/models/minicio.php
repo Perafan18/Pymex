@@ -66,7 +66,7 @@ class Minicio extends CI_Model {
 		}	
 	}
 	public function comprobarDuplicados($nombre){
-		$this->db->select('RazonSocial as Nombre');
+		$this->db->select('RazonSocial as Nombre,Giro,Domicilio,Colonia');
 		$this->db->where("RazonSocial",$nombre);
 		$query = $this->db->get('licencias');
 		if($query->num_rows()>0){
@@ -75,7 +75,14 @@ class Minicio extends CI_Model {
 			return FALSE;
 		}
 	}
-	
+	public function registroBusqueda($nombre,$tipo){
+		$nombre = array(
+			'busqueda' => $nombre,
+			'tipoBusqueda' => $tipo, 
+			'fechaBusqueda' => date('Y-m-d H:i:s'), 
+		);
+		$this->db->insert('_regbusqueda',$nombre);
+	}
 
 }
 
