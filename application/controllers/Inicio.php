@@ -17,7 +17,14 @@ class Inicio extends CI_Controller {
 	{
 		$data["contenido"] = $this->load->view('negociosCercanos',"", TRUE);
 		$this->load->view('html', $data, FALSE);
-
+	}
+	public function verCercanos()
+	{
+		$long = $this->input->get('long', TRUE);
+		$lat = $this->input->get('lat', TRUE);
+		$cercanos = $this->minicio->verCercanos($lat,$long);
+		$this->output->set_content_type('application/json')->set_output(json_encode($cercanos));
+		
 	}
 	public function buscar()
 	{

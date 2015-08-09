@@ -48,12 +48,14 @@
 	          </ul>
 	        </li>
 	      </ul>
+	      <!--
 	      <form class="navbar-form navbar-left" role="search">
 	        <div class="form-group">
 	          <input type="text" class="form-control" placeholder="Buscar...">
 	        </div>
 	        <button type="submit" class="btn btn-primary">Buscar</button>
 	      </form>
+	  -->
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
 	</nav>
@@ -72,13 +74,13 @@
 
 			<div id="ocupado" class="col-md-10 col-md-offset-1 well well-sm" style="display:none">
 				<h1 class="fadeIn animated" id="resultadoOcupado"></h1>
-				<a type="button" href="" class=" btn btn-success center">siguiente</a> 			
+				<a type="button" href="" class=" btn btn-success" style="display:none">Siguiente</a> 			
 			</div>	
 			
 
 			<div id="tablabla" style="display:none">
-				<table class="table table-bordered">
-		          <tr id="resultados">';
+				<table class="table table-bordered">';
+		          <tr id="resultados">
 		            <td>Nombre</td>
 		            <td>Tipo de giro</td>
 		            <td>direccion</td>
@@ -175,8 +177,7 @@
     	});
 
     	$("#comprobarNombre").on("keypress",function(event) {
-    		$("#ocupado").css("display","block");
-			if ( event.which == 13 ) {
+    		if ( event.which == 13 ) {
 		    	event.preventDefault();
 				var value = $(this).val();
 		  		$.ajax({
@@ -184,22 +185,30 @@
 		  			type : "POST",
 		  			data : {nombre:value},
 		  		}).done(function(data){
-		  			console.log(data);		  				
+		  			console.log(data);
+		  			$("#ocupado").css("display","block");		  				
 		  			$("#resultadoOcupado").text(data.resultado);
+		  			if(data.resultado=="Nombre Libre"){
+		  				$("#ocupado > a").css("display","block");
+		  			}else{	
+		  				$("#ocupado > a").css("display","none");
+		  			}
 		  		});	
 		  	}
     	});
 
     });
-	$("#localizacion").click(function(){
-		$("#mapacercanos").css("display","block");
+	$(document).on("ready",function(){
 		initialize();
+		console.log("Hola");
+	
 	});
 
 	$("#todo").click(function(){
 		$.ajax({
 			url : base_url+"gerardo/pruebados",
-			type: "GET"
+			type: "GET",
+			cache : false,
 		}).done(function(data){
 			$.each(data, function(index, val) {
 			 	var geocoder = new google.maps.Geocoder();
@@ -214,7 +223,7 @@
 
 	function initialize() {
 	  var mapOptions = {
-	    zoom: 15
+	    zoom: 14
 	  };
 	  map = new google.maps.Map(document.getElementById('map-canvas'),
 	      mapOptions);
@@ -222,16 +231,59 @@
 	  // Try HTML5 geolocation
 	  if(navigator.geolocation) {
 	    navigator.geolocation.getCurrentPosition(function(position) {
-	      var pos = new google.maps.LatLng(position.coords.latitude,
-	                                       position.coords.longitude);
-
-	      var infowindow = new google.maps.InfoWindow({
-	        map: map,
-	        position: pos,
-	        content: 'Tu posición'
-	      });
-
-	      map.setCenter(pos);
+	      	//aqui van cosas
+	    	
+		    var pos = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+		    console.log(pos);
+		    
+		    var infowindow = new google.maps.InfoWindow({
+		        map: map,
+		        position: pos,
+		        content: 'Tu posición'
+	 	     });
+			
+		    
+		    var array = [];
+		    var arraydos = [];
+		     
+		    map.setCenter(pos);
+	    	
+	    	$.ajax({
+	    		url : base_url+"inicio/verCercanos",
+	    		type: "GET",
+	    		data:{ lon:position.coords.longitude,lat:position.coords.latitude}
+	    	}).done(function(data){
+	    		console.log(data);
+	    		if(typeof data != "undefined"){
+	    			$.each(data, function(index, val) {
+	    				var nuevo = Number(val["Latitud"])/1.0;
+		    			var dos = Number(val["Longuitud"])/1.0;
+		    			nuevo = parseFloat(nuevo).toFixed(6);
+		    			dos = parseFloat(dos).toFixed(6);
+		    			var myLatlng = new google.maps.LatLng(dos,nuevo);
+		    			var marker = new google.maps.Marker({
+				      		position: myLatlng,
+						    map: map,
+						    title: val["RazonSocial"]
+						});
+	    			});
+	    		}
+	    	});
+	    	/*
+	    	setTimeout(function(){
+	    		for(var i=0;i<array.length;i++){
+	    			var nuevo = Number(array[i])/1.0;
+	    			var dos = Number(arraydos[i])/1.0;
+	    			nuevo = parseFloat(nuevo).toFixed(6);
+	    			dos = parseFloat(dos).toFixed(6);
+	    			var myLatlng = new google.maps.LatLng(dos,nuevo);
+	    			var marker = new google.maps.Marker({
+			      		position: myLatlng,
+					    map: map
+					});
+		    	}
+	    	},2000);
+	    	*/
 	    }, function() {
 	      handleNoGeolocation(true);
 	    });
@@ -274,11 +326,16 @@
 	        var markerOptions = { position: results[0].geometry.location }
 	        var marker = new google.maps.Marker(markerOptions);
 	        marker.setMap(map);
-
+	        posicion = results[0].geometry.location;
+	        var longuitud = posicion.G;
+	        var latitude = posicion.K;
+	        
 	        $.ajax({
 		    	url : base_url+"gerardo/guardarDatos",
-		    	data: {latitude:position.coords.latitude,longuitud:position.coords.longitude}
+		    	data: {latitude:latitude,longuitud:longuitud},
+		    	
 		    });
+			
 	    } else {
 	        // En caso de no haber resultados o que haya ocurrido un error
 	        // lanzamos un mensaje con el error
@@ -286,31 +343,6 @@
 	    }
 	}
 
-	function getLocation() {
-	    if (navigator.geolocation) {
-	        navigator.geolocation.getCurrentPosition(showPosition);
-	    } else {
-	        x.innerHTML = "Geolocation is not supported by this browser.";
-	    }
-	}
-	function showPosition(position) {
-		console.log("holla");
-	    x.innerHTML = "Latitude: " + position.coords.latitude + 
-	    "<br>Longitude: " + position.coords.longitude;
-	}
-	$(document).on(function(){
-		load_map();
-		
-	});
-	function load_map() {
-		    var myLatlng = new google.maps.LatLng(20.68009, -101.35403);
-		    var myOptions = {
-		        zoom: 4,
-		        center: myLatlng,
-		        mapTypeId: google.maps.MapTypeId.ROADMAP
-		    };
-		    map = new google.maps.Map($("#map_canvas").get(0), myOptions);
-		}
 /* 
  
 function load_map() {

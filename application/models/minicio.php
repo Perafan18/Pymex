@@ -76,14 +76,28 @@ class Minicio extends CI_Model {
 		}
 	}
 
+	public function verCercanos($lat,$long)
+	{
+		//( 6371 * ACOS( COS( RADIANS($lat) ) * COS(RADIANS( coordenadas.Latitud ) ) * COS(RADIANS( coordenadas.Longuitud )  - RADIANS($long) ) + SIN( RADIANS($lat) ) * SIN(RADIANS( coordenadas.Latitud ) ) )) AS distancia
+		//(6371 * ACOS( SIN(RADIANS(coordenadas.Latitud)) * SIN(RADIANS($lat)) + COS(RADIANS(coordenadas.Longuitud - $long)) * COS(RADIANS(coordenadas.Latitud)) * COS(RADIANS($lat)))) AS distance
+		$query =$this->db->query("SELECT licencias.ID, licencias.RazonSocial, coordenadas.Longuitud,coordenadas.Latitud, SQRT((($lat-coordenadas.Latitud)*($lat-coordenadas.Latitud))+(($long-coordenadas.Longuitud)*($long-coordenadas.Longuitud))) AS distancia FROM licencias INNER JOIN coordenadas ON licencias.ID = coordenadas.ID ORDER BY distancia DESC LIMIT 5");
+		if($query->num_rows()>0){
+			return $query->result_array();
+		}else{
+			return FALSE;
+		}
+	}
+	
+
 	public function registroBusqueda($nombre,$tipo){
 		$nombre = array(
 			'busqueda' => $nombre,
 			'tipoBusqueda' => $tipo, 
-			'fechaBusqueda' => date('Y-m-d H:i:s') 
+			'fechaBusqueda' => date('Y-m-d H:i:s')
 		);
 		$this->db->insert('_regbusqueda',$nombre);
 	}
+
 
 }
 

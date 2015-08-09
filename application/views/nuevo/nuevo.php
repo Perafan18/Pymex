@@ -13,7 +13,7 @@
 		-->
 	</form>
 </div>
-
+<!--
 <!DOCTYPE html>
 <html>
   <head>
@@ -127,3 +127,4 @@ google.maps.event.addDomListener(window, 'load', initialize);
   </body>
 </html>
 
+-->
