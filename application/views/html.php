@@ -65,7 +65,7 @@
 			<?php
 			echo isset($contenido)? $contenido : '';
 			?>
-			<div>
+			<div id="tablabla" style="display:none">
 				<table class="table table-bordered">';
 		          <tr id="resultados">
 		            <td>Nombre</td>
@@ -108,8 +108,8 @@
     	
     	base_url = "<?php echo base_url();?>";
     	$("#InputNombre").on("keypress",function(event) {
-    		$("#resultados").html(" ");
-			if ( event.which == 13 ) {
+    		$("#tablabla").css("display","block");
+    		if ( event.which == 13 ) {
 		    	event.preventDefault();
 				var value = $(this).val();
 		  		$.ajax({
@@ -119,18 +119,16 @@
 		  		}).done(function(data){
 		  			console.log(data);
 		  			if(data!=false){
-		  				$("#resultados").append(inicioPlantilla());
 		  				$.each(data, function(index, val) {
-		  					$("#resultados").append(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
 		  				});
-		  				$("#resultados").append(fin());
 		  			}
 		  		});	
 		  	}
     	});
     	
     	$("#SelectColonia").change(function(event) {
-    		$("#resultados").html(" ");
+    		$("#tablabla").css("display","block");
 			var colonia = $(this).val();
 				$.ajax({
 		  			url : base_url+"inicio/busquedaColonia",
@@ -139,18 +137,15 @@
 		  		}).done(function(data){
 		  			console.log(data);
 		  			if(data!=false){
-		  				$("#resultados").append(inicioPlantilla());
 		  				$.each(data, function(index, val) {
-		  					$("#resultados").append(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
 		  				});
-		  				
-		  				$("#resultados").append(fin());
 		  			}
 		  		});
     	});
 
 		$("#SelectGiros").change(function(event) {
-			$("#resultados").html(" ");
+			$("#tablabla").css("display","block");
 			var  giro = $(this).val();
 				$.ajax({
 		  			url : base_url+"inicio/busquedaGiro",
@@ -159,11 +154,11 @@
 		  		}).done(function(data){
 		  			console.log(data);
 		  			if(data!=false){
-		  				$("#resultados").append(inicioPlantilla());
+		  				
 		  				$.each(data, function(index, val) {
-		  					$("#resultados").append(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
+		  					$( "#resultados" ).after(plantilla(val["Nombre"],val["Giro"],val["Domicilio"]+val["Colonia"]));
 		  				});
-		  				$("#resultados").append(fin());
+		  				
 		  			}
 		  		});
     	});
