@@ -11,8 +11,8 @@
     <?php
     $url = base_url();
     ?>
-
-     <link href="<?=$url?>css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/animate.css" rel="stylesheet">
+    <link href="<?=$url?>css/bootstrap.min.css" rel="stylesheet">
 	<script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7170VuMY8-WHDKzMImO-9Lv2LpFH7xwQ"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -65,6 +65,11 @@
 			<?php
 			echo isset($contenido)? $contenido : '';
 			?>
+			<div id="ocupado" class="col-md-10 col-md-offset-1 well well-sm">
+				<h1 class="fadeIn animated" id="resultadoOcupado"></h1>
+				<a type="button" href="" class=" btn btn-success">siguiente</a> 			
+			</div>	
+			
 			<div>
 				<table class="table table-bordered">';
 		          <tr id="resultados">
@@ -166,6 +171,22 @@
 		  				$("#resultados").append(fin());
 		  			}
 		  		});
+    	});
+
+    	$("#comprobarNombre").on("keypress",function(event) {
+    		$("#resultados").html(" ");
+			if ( event.which == 13 ) {
+		    	event.preventDefault();
+				var value = $(this).val();
+		  		$.ajax({
+		  			url : base_url+"nuevo/nombreOcupado",
+		  			type : "POST",
+		  			data : {nombre:value},
+		  		}).done(function(data){
+		  			console.log(data);		  				
+		  			$("#resultadoOcupado").text(data.resultado);
+		  		});	
+		  	}
     	});
 
     });

@@ -65,6 +65,17 @@ class Minicio extends CI_Model {
 			return FALSE;
 		}	
 	}
+	public function comprobarDuplicados($nombre){
+		$this->db->select('RazonSocial as Nombre');
+		$this->db->where("RazonSocial",$nombre);
+		$query = $this->db->get('licencias');
+		if($query->num_rows()>0){
+			return $query->result_array();
+		}else{
+			return FALSE;
+		}
+	}
+
 
 }
 
